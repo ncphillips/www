@@ -7,7 +7,10 @@ import Quote from "../components/Quote";
 import Play from "../components/icons/play";
 import Pause from "../components/icons/pause";
 import { usePlugin, useCMS } from "tinacms";
-import { useGithubToolbarPlugins } from "react-tinacms-github";
+import {
+  useGithubToolbarPlugins,
+  useGithubEditing,
+} from "react-tinacms-github";
 import { getGithubPreviewProps, parseJson } from "next-tinacms-github";
 import { TRANSITION_DURATION } from "../lib/transition";
 import { useSiteDataForm } from "../lib/use-site-data-form";
@@ -285,6 +288,7 @@ function FoundersList({
           ))}
         </div>
       </div>
+      <EditLink editMode={preview} />
       <Styles theme={theme} />
     </>
   );
@@ -493,4 +497,34 @@ export const getStaticProps = async function ({ preview, previewData }) {
       },
     },
   };
+};
+
+const EditLink = ({ editMode }) => {
+  const github = useGithubEditing();
+  const [pending, setPending] = React.useState(false);
+
+  const style = {
+    margin: "2.5rem 0 2.5rem 0",
+    width: "100%",
+    border: "none",
+    alignText: "center",
+    background: "transparent",
+  };
+
+  return (
+    <button
+      style={style}
+      onClick={() => {
+        setPending(true);
+        if (editMode) {
+          github.exitEditMode();
+        } else {
+          github.enterEditMode();
+        }
+      }}
+    >
+      {pending && "One Moment..."}
+      {!pending && (editMode ? "Click to Stop Editing" : "Click to Edit")}
+    </button>
+  );
 };

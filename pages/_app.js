@@ -1,7 +1,6 @@
 import App from "next/app";
 import { TinaCMS, TinaProvider } from "tinacms";
 import {
-  useGithubEditing,
   GithubClient,
   TinacmsGithubProvider,
   GithubMediaStore,
@@ -60,38 +59,8 @@ export default class Site extends App {
            * 5. Add a button for entering Preview/Edit Mode
            */}
           <Component {...pageProps} />
-          <EditLink editMode={pageProps.preview} />
         </TinacmsGithubProvider>
       </TinaProvider>
     );
   }
 }
-
-export const EditLink = ({ editMode }) => {
-  const github = useGithubEditing();
-  const [pending, setPending] = React.useState(false);
-
-  const style = {
-    margin: "2.5rem 0 2.5rem 0",
-    width: "100%",
-    border: "none",
-    background: "transparent",
-  };
-
-  return (
-    <button
-      style={style}
-      onClick={() => {
-        setPending(true);
-        if (editMode) {
-          github.exitEditMode();
-        } else {
-          github.enterEditMode();
-        }
-      }}
-    >
-      {pending && "One Moment..."}
-      {!pending && (editMode ? "Click to Stop Editing" : "Click to Edit")}
-    </button>
-  );
-};
