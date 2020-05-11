@@ -512,6 +512,9 @@ const EditLink = ({ editMode }) => {
     alignText: "center",
     background: "transparent",
     cursor: "pointer",
+    "&:hover": {
+      borderBottom: "1px solid black";
+    },
   };
 
   return (
