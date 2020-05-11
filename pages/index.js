@@ -6,7 +6,7 @@ import DarkToggle from "../components/dark-toggle";
 import Quote from "../components/Quote";
 import Play from "../components/icons/play";
 import Pause from "../components/icons/pause";
-import { usePlugin } from "tinacms";
+import { usePlugin, useCMS } from "tinacms";
 import { useGithubToolbarPlugins } from "react-tinacms-github";
 import { getGithubPreviewProps, parseJson } from "next-tinacms-github";
 import { TRANSITION_DURATION } from "../lib/transition";
@@ -213,9 +213,11 @@ function FoundersList({
 }) {
   const [{ links, founders }, form] = useSiteDataForm(file);
   const activeFounder = founders[activeFounderIndex];
+  const filePreview = useFilePreview(preview);
 
   usePlugin(form);
   useGithubToolbarPlugins();
+
   return (
     <>
       <div className="messages">
@@ -228,7 +230,7 @@ function FoundersList({
               style={{
                 backgroundRepeat: `no-repeat`,
                 backgroundSize: `100% 100%`,
-                backgroundImage: `url('${founder.picture}')`,
+                backgroundImage: `url('${filePreview(founder.picture)}')`,
               }}
               key={founder.name}
               onClick={() => setActiveFounderIndex(index)}
@@ -285,6 +287,23 @@ function FoundersList({
       </div>
       <Styles theme={theme} />
     </>
+  );
+}
+
+function useFilePreview(preview) {
+  const cms = useCMS();
+
+  return React.useCallback(
+    (filename) => {
+      if (!preview) return filename;
+      const repo = cms.api.github.workingRepoFullName;
+      const branch = cms.api.github.branchName;
+
+      // Fetches Content from Github when editing because new files
+      // will not be available on the production vercel server yet
+      return `https://raw.githubusercontent.com/${repo}/${branch}/${filename}`;
+    },
+    [preview]
   );
 }
 
