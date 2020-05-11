@@ -504,6 +504,8 @@ const EditLink = ({ editMode }) => {
   const [pending, setPending] = React.useState(false);
 
   const style = {
+    textAlign: "center",
+    display: "inline-block",
     margin: "2.5rem 0 2.5rem 0",
     width: "100%",
     border: "none",
@@ -512,7 +514,7 @@ const EditLink = ({ editMode }) => {
   };
 
   return (
-    <button
+    <a
       style={style}
       onClick={() => {
         setPending(true);
@@ -525,6 +527,6 @@ const EditLink = ({ editMode }) => {
     >
       {pending && "One Moment..."}
       {!pending && (editMode ? "Click to Stop Editing" : "Click to Edit")}
-    </button>
+    </a>
   );
 };
