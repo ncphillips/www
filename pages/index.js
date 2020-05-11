@@ -511,6 +511,7 @@ const EditLink = ({ editMode }) => {
     border: "none",
     alignText: "center",
     background: "transparent",
+    cursor: "pointer",
   };
 
   return (
