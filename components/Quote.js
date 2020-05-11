@@ -3,7 +3,15 @@ import { useCMS } from "tinacms";
 
 import { TRANSITION_DURATION } from "../lib/transition";
 
-const Quote = (props) => {
+const Quote = ({
+  name,
+  message,
+  link,
+  company,
+  year,
+  flags = [],
+  ...props
+}) => {
   const cms = useCMS();
 
   const audioSrc = React.useMemo(() => {
@@ -19,17 +27,17 @@ const Quote = (props) => {
 
   return (
     <section className={props.transitioning ? "transitioning" : ""}>
-      <div className="message">{props.message}</div>
-      <div className="person">—{props.person}</div>
+      <div className="message">{message}</div>
+      <div className="person">—{name}</div>
       <div className="company">
-        <a href={props.preview ? undefined : props.link} target="_blank">
-          {props.company}
+        <a href={props.preview ? undefined : link} target="_blank">
+          {company}
         </a>
       </div>
       <div className="year">
-        (Partnered in {props.year})
+        (Partnered in {year})
         <div className="flag">
-          {props.flags.map((flag) => (
+          {flags.map((flag) => (
             <img key={flag} src={flag} />
           ))}
         </div>
