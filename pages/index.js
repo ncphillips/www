@@ -513,7 +513,7 @@ const EditLink = ({ editMode }) => {
     background: "transparent",
     cursor: "pointer",
     "&:hover": {
-      borderBottom: "1px solid black";
+      borderBottom: "1px solid black",
     },
   };
 
