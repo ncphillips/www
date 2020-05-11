@@ -52,7 +52,7 @@ export default class Index extends React.Component {
         this.audio.pause();
         this.setState({ audioPlaying: false });
       } else {
-        this.audio.play();
+        this.playAudio();
         this.setState({ audioPlaying: true });
       }
     } else {
@@ -60,7 +60,7 @@ export default class Index extends React.Component {
         await sleep(TRANSITION_DURATION);
 
         this.setState({ activeFounder, audioPlaying: true }, () => {
-          this.audio.play();
+          this.playAudio();
 
           setTimeout(
             () => this.setState({ transitioning: false }),
@@ -85,9 +85,15 @@ export default class Index extends React.Component {
         audioPlaying: true,
       },
       () => {
-        this.audio.play();
+        this.playAudio();
       }
     );
+  };
+
+  playAudio = () => {
+    if (this.state.activeFounder.audio) {
+      this.audio.play();
+    }
   };
 
   audioRef = (ref) => {
@@ -220,10 +226,9 @@ function FoundersList({
   onAudioEnd,
 }) {
   const [{ links, founders }, form] = useSiteDataForm(file);
-  const activeFounderIndex = founders.findIndex(
+  const activeFounderValues = founders.find(
     ({ name }) => name === activeFounder.name
   );
-  const activeFounderValues = founders[activeFounderIndex];
 
   usePlugin(form);
   useGithubToolbarPlugins();
@@ -260,7 +265,6 @@ function FoundersList({
         transitioning={transitioning}
         audioRef={audioRef}
         onAudioEnd={onAudioEnd}
-        index={activeFounderIndex}
         {...activeFounderValues}
       />
       <div className="contact">
