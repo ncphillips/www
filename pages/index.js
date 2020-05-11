@@ -37,7 +37,7 @@ export default class Index extends React.Component {
   state = {
     // TODO: Dark Theme is clashing with Tina right now
     activeTheme: this.props.theme || "light",
-    activeFounder: this.FOUNDERS["Max Mullen"],
+    activeFounderIndex: 0,
     audioPlaying: false,
   };
 
@@ -46,8 +46,8 @@ export default class Index extends React.Component {
     document.cookie = `theme=${activeTheme}`;
   };
 
-  changeFounder = (activeFounder) => {
-    if (activeFounder.person === this.state.activeFounder.person) {
+  changeFounder = (activeFounderIndex) => {
+    if (activeFounderIndex === this.state.activeFounderIndex) {
       if (this.state.audioPlaying) {
         this.audio.pause();
         this.setState({ audioPlaying: false });
@@ -59,7 +59,7 @@ export default class Index extends React.Component {
       this.setState({ transitioning: true }, async () => {
         await sleep(TRANSITION_DURATION);
 
-        this.setState({ activeFounder, audioPlaying: true }, () => {
+        this.setState({ activeFounderIndex, audioPlaying: true }, () => {
           this.playAudio();
 
           setTimeout(
@@ -72,18 +72,11 @@ export default class Index extends React.Component {
   };
 
   onAudioEnd = () => {
-    const { activeFounder } = this.state;
-    const nextFounderIndex =
-      Object.keys(this.FOUNDERS).indexOf(activeFounder.person) + 1;
-    const nextFounder =
-      Object.values(this.FOUNDERS)[nextFounderIndex] ||
-      Object.values(this.FOUNDERS)[0];
-
     this.setState(
-      {
-        activeFounder: nextFounder,
+      ({ activeFounderIndex }) => ({
+        activeFounderIndex: activeFounderIndex + 1,
         audioPlaying: true,
-      },
+      }),
       () => {
         this.playAudio();
       }
@@ -91,25 +84,18 @@ export default class Index extends React.Component {
   };
 
   playAudio = () => {
-    if (this.state.activeFounder.audio) {
+    if (this.audio) {
       this.audio.play();
     }
   };
 
   audioRef = (ref) => {
-    if (!ref) return;
-    this.audio = ref.audioEl;
+    if (!ref) {
+      this.audio = null;
+    } else {
+      this.audio = ref.audioEl;
+    }
   };
-
-  get FOUNDERS() {
-    const founderArray = this.props.file.data.founders;
-
-    let foundersDict = {};
-
-    founderArray.forEach((founder) => (foundersDict[founder.name] = founder));
-
-    return foundersDict;
-  }
 
   render() {
     const { activeTheme } = this.state;
@@ -173,8 +159,8 @@ export default class Index extends React.Component {
           <FoundersList
             preview={this.props.preview}
             file={this.props.file}
-            activeFounder={this.state.activeFounder}
-            setActiveFounder={this.changeFounder}
+            activeFounderIndex={this.state.activeFounderIndex}
+            setActiveFounderIndex={this.changeFounder}
             audioPlaying={this.audioPlaying}
             theme={theme}
             transitioning={this.state.transitioning}
@@ -217,8 +203,8 @@ export default class Index extends React.Component {
 function FoundersList({
   preview,
   file,
-  activeFounder,
-  setActiveFounder,
+  activeFounderIndex,
+  setActiveFounderIndex,
   audioPlaying,
   theme,
   transitioning,
@@ -226,9 +212,7 @@ function FoundersList({
   onAudioEnd,
 }) {
   const [{ links, founders }, form] = useSiteDataForm(file);
-  const activeFounderValues = founders.find(
-    ({ name }) => name === activeFounder.name
-  );
+  const activeFounder = founders[activeFounderIndex];
 
   usePlugin(form);
   useGithubToolbarPlugins();
@@ -238,7 +222,7 @@ function FoundersList({
         <h3>Founders</h3>
         <div className="line"></div>
         <div className="audios">
-          {founders.map((founder) => (
+          {founders.map((founder, index) => (
             <button
               className="audio"
               style={{
@@ -247,9 +231,9 @@ function FoundersList({
                 backgroundImage: `url('${founder.picture}')`,
               }}
               key={founder.name}
-              onClick={() => setActiveFounder(founder)}
+              onClick={() => setActiveFounderIndex(index)}
             >
-              {activeFounder.person === founder.name && audioPlaying ? (
+              {activeFounderIndex === index && audioPlaying ? (
                 <Pause color={theme.main} />
               ) : (
                 <div className="play-icon">
@@ -265,7 +249,7 @@ function FoundersList({
         transitioning={transitioning}
         audioRef={audioRef}
         onAudioEnd={onAudioEnd}
-        {...activeFounderValues}
+        {...activeFounder}
       />
       <div className="contact">
         <h3>About Me</h3>
